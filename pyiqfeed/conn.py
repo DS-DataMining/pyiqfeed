@@ -1993,7 +1993,7 @@ class HistoryConn(FeedConn):
                      max_bars: int,
                      ascend: bool = False,
                      label_at_begin=False,
-                     timeout: int = None) -> np.array:
+                     timeout: int = None):
         """
         Get max_bars number of bars of bar_data from IQFeed.
 
