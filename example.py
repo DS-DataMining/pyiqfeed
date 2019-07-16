@@ -13,7 +13,7 @@ import argparse
 import datetime
 import pyiqfeed as iq
 import time
-from localconfig.passwords import dtn_product_id, dtn_login, dtn_password
+from .passwords import dtn_product_id, dtn_login, dtn_password
 
 
 def launch_service():
@@ -407,7 +407,7 @@ if __name__ == "__main__":
     if results.trade_updates:
         get_trades_only(ticker="SPY", seconds=30)
     if results.interval_data:
-        get_live_interval_bars(ticker="SPY", bar_len=5, seconds=30)
+        get_live_interval_bars(ticker="XG#", bar_len=60, seconds=60)
     if results.admin_socket:
         get_administrative_messages(seconds=30)
     if results.historical_tickdata:
