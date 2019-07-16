@@ -580,7 +580,7 @@ class VerboseBarListener(VerboseIQFeedListener):
         print(bar_data)
 
     def process_live_bar(self, bar_data: np.array) -> None:
-        print("%s: Process live bar:" % self._name)
+        print("%s: Dynamicasoft Process live bar:" % self._name)
         print(bar_data)
 
     def process_history_bar(self, bar_data: np.array) -> None:

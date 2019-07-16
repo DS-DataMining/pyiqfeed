@@ -20,3 +20,5 @@ from .field_readers import (us_since_midnight_to_time,
 
 from .exceptions import NoDataError, UnexpectedField, UnexpectedMessage
 from .exceptions import UnexpectedProtocol, UnauthorizedError
+
+from .iqfeed_api_wrapper import IQFeedApiWrapper
