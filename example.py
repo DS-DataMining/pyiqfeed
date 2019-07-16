@@ -13,7 +13,7 @@ import argparse
 import datetime
 import pyiqfeed as iq
 import time
-from .passwords import dtn_product_id, dtn_login, dtn_password
+from passwords import dtn_product_id, dtn_login, dtn_password
 
 
 def launch_service():
@@ -81,7 +81,7 @@ def get_live_interval_bars(ticker: str, bar_len: int, seconds: int):
 
     with iq.ConnConnector([bar_conn]) as connector:
         bar_conn.watch(symbol=ticker, interval_len=bar_len,
-                       interval_type='s', update=1, lookback_bars=10)
+                       interval_type='s', update=0, lookback_bars=10)
         time.sleep(seconds)
 
 
