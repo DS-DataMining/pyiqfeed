@@ -62,6 +62,7 @@ from .exceptions import NoDataError, UnexpectedField, UnexpectedMessage
 from .exceptions import UnexpectedProtocol, UnauthorizedError
 from . import field_readers as fr
 
+import pandas as pd
 
 class FeedConn:
     """
