@@ -1961,11 +1961,13 @@ class HistoryConn(FeedConn):
         else:
             data = np.empty(res.num_pts, HistoryConn.bar_type)
             line_num = 0
+            a = []
             while res.raw_data and (line_num < res.num_pts):
                 dl = res.raw_data.popleft()
                 (dt, tm) = fr.read_posix_ts(dl[1])
-                data[line_num]['date'] = dt
-                data[line_num]['time'] = tm
+                data[line_num]['date'] = dl[1]
+                #data[line_num]['date'] = dt
+                #data[line_num]['time'] = tm
                 data[line_num]['high_p'] = np.float64(dl[2])
                 data[line_num]['low_p'] = np.float64(dl[3])
                 data[line_num]['open_p'] = np.float64(dl[4])
@@ -1973,12 +1975,13 @@ class HistoryConn(FeedConn):
                 data[line_num]['tot_vlm'] = np.int64(dl[6])
                 data[line_num]['prd_vlm'] = np.int64(dl[7])
                 data[line_num]['num_trds'] = np.int64(dl[8])
+                a.append([dl[x] for x in [1, 2, 3, 4, 5, 7]])
                 line_num += 1
                 if line_num >= res.num_pts:
                     assert len(res.raw_data) == 0
                 if len(res.raw_data) == 0:
                     assert line_num >= res.num_pts
-            return data
+            return np.array(a)
 
     def request_bars(self,
                      ticker: str,

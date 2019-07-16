@@ -171,7 +171,7 @@ def get_historical_bar_data(ticker: str, bar_len: int, bar_unit: str,
                                           interval_len=bar_len,
                                           interval_type=bar_unit,
                                           max_bars=num_bars)
-            print(bars)
+            print("AAA", bars)
 
             today = datetime.date.today()
             start_date = today - datetime.timedelta(days=10)
@@ -192,7 +192,7 @@ def get_historical_bar_data(ticker: str, bar_len: int, bar_unit: str,
                                                     interval_type=bar_unit,
                                                     bgn_prd=start_time,
                                                     end_prd=end_time)
-            print(bars)
+            print("BBB", bars)
         except (iq.NoDataError, iq.UnauthorizedError) as err:
             print("No data returned because {0}".format(err))
 
@@ -413,10 +413,10 @@ if __name__ == "__main__":
     if results.historical_tickdata:
         get_tickdata(ticker="SPY", max_ticks=100, num_days=4)
     if results.historical_bars:
-        get_historical_bar_data(ticker="SPY",
+        get_historical_bar_data(ticker="XG#",
                                 bar_len=60,
                                 bar_unit='s',
-                                num_bars=100)
+                                num_bars=10)
     if results.historical_daily_data:
         get_daily_data(ticker="SPY", num_days=10)
     if results.reference_data:
