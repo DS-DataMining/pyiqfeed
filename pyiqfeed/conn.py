@@ -1957,7 +1957,7 @@ class HistoryConn(FeedConn):
         """Get buffer for req_id and transform to a numpy array of bars."""
         res = self._get_data_buf(req_id)
         if res.failed:
-            return (False, res[.err_msg])
+            return (False, res.err_msg)
         else:
             data = np.empty(res.num_pts, HistoryConn.bar_type)
             line_num = 0
