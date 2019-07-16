@@ -1957,31 +1957,34 @@ class HistoryConn(FeedConn):
         """Get buffer for req_id and transform to a numpy array of bars."""
         res = self._get_data_buf(req_id)
         if res.failed:
-            return np.array([res.err_msg], dtype='object')
+            return (False, res[.err_msg])
         else:
             data = np.empty(res.num_pts, HistoryConn.bar_type)
             line_num = 0
-            a = []
+            data = []
             while res.raw_data and (line_num < res.num_pts):
                 dl = res.raw_data.popleft()
-                (dt, tm) = fr.read_posix_ts(dl[1])
-                data[line_num]['date'] = dl[1]
-                #data[line_num]['date'] = dt
-                #data[line_num]['time'] = tm
-                data[line_num]['high_p'] = np.float64(dl[2])
-                data[line_num]['low_p'] = np.float64(dl[3])
-                data[line_num]['open_p'] = np.float64(dl[4])
-                data[line_num]['close_p'] = np.float64(dl[5])
-                data[line_num]['tot_vlm'] = np.int64(dl[6])
-                data[line_num]['prd_vlm'] = np.int64(dl[7])
-                data[line_num]['num_trds'] = np.int64(dl[8])
-                a.append([dl[x] for x in [1, 2, 3, 4, 5, 7]])
+                data.append([dl[x] for x in [1, 2, 3, 4, 5, 7]])
                 line_num += 1
+                # (dt, tm) = fr.read_posix_ts(dl[1])
+                # data[line_num]['date'] = dl[1]
+                # data[line_num]['date'] = dt
+                # data[line_num]['time'] = tm
+                # data[line_num]['high_p'] = np.float64(dl[2])
+                # data[line_num]['low_p'] = np.float64(dl[3])
+                # data[line_num]['open_p'] = np.float64(dl[4])
+                # data[line_num]['close_p'] = np.float64(dl[5])
+                # data[line_num]['tot_vlm'] = np.int64(dl[6])
+                # data[line_num]['prd_vlm'] = np.int64(dl[7])
+                # data[line_num]['num_trds'] = np.int64(dl[8])
                 if line_num >= res.num_pts:
                     assert len(res.raw_data) == 0
                 if len(res.raw_data) == 0:
                     assert line_num >= res.num_pts
-            return np.array(a)
+            cols = ["datetime", "high", "low", "open", "close", "volume"]
+            data = pd.DataFrame(data, columns=cols)
+            [data[col].map(float) for col in cols[1:]]
+            return (True, data)
 
     def request_bars(self,
                      ticker: str,
@@ -2024,9 +2027,9 @@ class HistoryConn(FeedConn):
             interval_type, label_at_begin))
         self._send_cmd(req_cmd)
         self._req_event[req_id].wait(timeout=timeout)
-        data = self._read_bars(req_id)
-        if data.dtype == object:
-            iqfeed_err = str(data[0])
+        isOk, data = self._read_bars(req_id)
+        if not isOk:
+            iqfeed_err = data
             err_msg = "Request: %s, Error: %s" % (req_cmd, iqfeed_err)
             if iqfeed_err == '!NO_DATA!':
                 raise NoDataError(err_msg)
