@@ -15,6 +15,18 @@ class IQFeedApiWrapper:
         self.credentials = credentials
         self.launch_service()
 
+    @staticmethod
+    def get_tz_col(df):
+        def to_ts(datetime_str):
+            tz = pytz.timezone('America/New_York')
+            time = dt.datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:00')
+            time = tz.localize(time, is_dst=True)
+            time = time.astimezone(pytz.utc)
+            return int(time.timestamp())
+
+        df["tz-time"] = df["datetime"].map(to_ts)
+        return df
+
     def launch_service(self):
         """Check if IQFeed.exe is running and start if not"""
         product, login, password = self.credentials
@@ -29,6 +41,7 @@ class IQFeedApiWrapper:
             name="dynamicasoft-historical-bars-for-trading")
         hist_listener = VerboseIQFeedListener("History Bar Listener")
         hist_conn.add_listener(hist_listener)
+        n = n + 1
 
         with ConnConnector([hist_conn]) as connector:
             # look at conn.py for request_bars, request_bars_for_days and
@@ -38,6 +51,7 @@ class IQFeedApiWrapper:
                                               interval_len=freq_in_sec,
                                               interval_type=bar_unit,
                                               max_bars=n)
+                bars = IQFeedApiWrapper.get_tz_col(bars)
                 return bars.iloc[1:]
             except (NoDataError, UnauthorizedError) as err:
                 print("No data returned because {0}".format(err))
@@ -50,13 +64,5 @@ class IQFeedApiWrapper:
         bars = self.get_last_n_bars(symbol, freq_in_sec, expected_bars)
         if bars is False:
             return False
-
-        def to_ts(datetime_str):
-            tz = pytz.timezone('America/New_York')
-            time = dt.datetime.strptime(datetime_str, '%Y-%m-%d %H:%M:00')
-            time = tz.localize(time, is_dst=True)
-            time = time.astimezone(pytz.utc)
-            return int(time.timestamp())
-
-        bars["tz-time"] = bars["datetime"].map(to_ts)
-        return bars[bars["tz-time"] > last_ts]
+        bars = IQFeedApiWrapper.get_tz_col(bars)
+        return bars[bars["tz-time"] >= last_ts]
